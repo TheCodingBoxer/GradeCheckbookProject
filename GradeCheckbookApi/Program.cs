@@ -1,9 +1,47 @@
+using ApplicationCore.Constants;
+using Infrastructure.Identity;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddScoped<IdentityTokenClaimService>();
+
+builder.Services.AddDbContext<AppIdentityDbContext>(option =>
+{
+    option.UseSqlServer(builder.Configuration.GetConnectionString(AppConstants.IDENTITY_CONNECTION));
+});
+
+builder.Services
+    .AddIdentityCore<ApplicationUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<AppIdentityDbContext>()
+    .AddSignInManager<SignInManager<ApplicationUser>>();
+
+var key = Encoding.UTF8.GetBytes(builder.Configuration[AppConstants.JWT_SECRET_KEY]);
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(config =>
+    {
+        config.RequireHttpsMetadata = false;
+        config.SaveToken = true;
+        config.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
