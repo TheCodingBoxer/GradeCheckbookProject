@@ -29,7 +29,10 @@ namespace Infrastructure.Identity
             var key = Encoding.ASCII.GetBytes(_config[AppConstants.JWT_SECRET_KEY]);
             var user = await _userManager.FindByNameAsync(userName);
             var roles = await _userManager.GetRolesAsync(user);
-            var claims = new List<Claim> { new Claim(ClaimTypes.Name, userName) };
+            var claims = new List<Claim> {
+                new Claim(ClaimTypes.Name, userName),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
 
             foreach (var role in roles)
             {
