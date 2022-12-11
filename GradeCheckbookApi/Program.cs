@@ -1,14 +1,32 @@
 using ApplicationCore.Constants;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(configure =>
+{
+    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+    configure.Filters.Add(new AuthorizeFilter(policy));
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()
+            .WithHeaders("authorization", "accept", "content-type", "origin")
+            .AllowCredentials();
+        });
+});
 
 builder.Services.AddScoped<IdentityTokenClaimService>();
 
