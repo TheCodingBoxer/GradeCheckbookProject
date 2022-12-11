@@ -1,0 +1,50 @@
+@use "./functions" as *;
+
+$black: #212529;
+$white: #ffffff;
+$red: #ee0d0d;
+$yellow: #ffea00;
+$green: #198754;
+
+$black-100: tint-color($black, 80%);
+$black-200: tint-color($black, 60%);
+$black-300: tint-color($black, 40%);
+$black-400: tint-color($black, 20%);
+$black-500: $black;
+$black-600: shade-color($black, 20%);
+$black-700: shade-color($black, 40%);
+$black-800: shade-color($black, 60%);
+$black-900: shade-color($black, 80%);
+
+$green-100: tint-color($green, 80%);
+$green-200: tint-color($green, 60%);
+$green-300: tint-color($green, 40%);
+$green-400: tint-color($green, 20%);
+$green-500: $green;
+$green-600: shade-color($green, 20%);
+$green-700: shade-color($green, 40%);
+$green-800: shade-color($green, 60%);
+$green-900: shade-color($green, 80%);
+
+$red-100: tint-color($red, 80%);
+$red-200: tint-color($red, 60%);
+$red-300: tint-color($red, 40%);
+$red-400: tint-color($red, 20%);
+$red-500: $red;
+$red-600: shade-color($red, 20%);
+$red-700: shade-color($red, 40%);
+$red-800: shade-color($red, 60%);
+$red-900: shade-color($red, 80%);
+
+$yellow-100: tint-color($yellow, 80%);
+$yellow-200: tint-color($yellow, 60%);
+$yellow-300: tint-color($yellow, 40%);
+$yellow-400: tint-color($yellow, 20%);
+$yellow-500: $yellow;
+$yellow-600: shade-color($yellow, 20%);
+$yellow-700: shade-color($yellow, 40%);
+$yellow-800: shade-color($yellow, 60%);
+$yellow-900: shade-color($yellow, 80%);
+
+$primary: $red-700;
+$primary-hover: $red-800;

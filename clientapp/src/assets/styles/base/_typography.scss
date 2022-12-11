@@ -1,0 +1,27 @@
+html {
+  font-family: Arial, Poppins, sans-serif;
+  font-size: 62.5%;
+}
+
+h1 {
+  font-size: 8rem;
+}
+h2 {
+  font-size: 6rem;
+}
+h3 {
+  font-size: 4rem;
+}
+h4 {
+  font-size: 2rem;
+}
+
+button,
+input,
+.text {
+  font-size: 16px;
+
+  &--sm {
+    font-size: 12px;
+  }
+}

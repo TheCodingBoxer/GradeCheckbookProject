@@ -1,0 +1,12 @@
+@use "../abstract" as *;
+
+main {
+  background-color: $white;
+  box-shadow: 10px 10px 25px $black-400;
+
+  margin: auto;
+  padding: 10px;
+
+  height: calc(100vh - 8rem);
+  max-width: 1000px;
+}
