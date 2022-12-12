@@ -8,15 +8,15 @@ import InputText from "../../components/Input/InputText";
 import Button from "../../components/Button/Button";
 
 export default function Login() {
-  const [userName, setUserName] = useState("");
+  const [userNameOrEmail, setUserNameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErroMessage] = useState("");
 
   const { currentUserStore, tokenStore } = useRootStore();
   const navigate = useNavigate();
 
-  const onUserNameValueChanged = ({ target }) => {
-    setUserName(target.value);
+  const onUserNameOrEmailValueChanged = ({ target }) => {
+    setUserNameOrEmail(target.value);
   };
 
   const onPasswordValueChanged = ({ target }) => {
@@ -25,12 +25,15 @@ export default function Login() {
 
   const onLoginClicked = async () => {
     setErroMessage("");
-    if (userName.length === 0 || password.length === 0) {
+    if (userNameOrEmail.length === 0 || password.length === 0) {
       setErroMessage("User name and/or password are missing");
       return;
     }
     try {
-      const { data } = await dataService.login({ email: userName, password });
+      const { data } = await dataService.login({
+        userNameOrEmail,
+        password,
+      });
 
       currentUserStore.setCurrentUser(
         data.userProfile.displayName,
@@ -62,9 +65,9 @@ export default function Login() {
           <h3>Sandbox</h3>
           <hr />
           <InputText
-            placeholder="User Name"
-            value={userName}
-            onChange={onUserNameValueChanged}
+            placeholder="Username or email address"
+            value={userNameOrEmail}
+            onChange={onUserNameOrEmailValueChanged}
           />
           <InputText
             type="password"
@@ -72,7 +75,7 @@ export default function Login() {
             value={password}
             onChange={onPasswordValueChanged}
           />
-          <Button text="Login" onClick={onLoginClicked} />
+          <Button text="Sign In" onClick={onLoginClicked} />
           {errorMessage && <ErrorMessage message={errorMessage} />}
         </div>
       </div>
