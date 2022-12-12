@@ -27,12 +27,10 @@ namespace Infrastructure.Identity
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_config[AppConstants.JWT_SECRET_KEY]);
+            
             var user = await _userManager.FindByNameAsync(userName);
             var roles = await _userManager.GetRolesAsync(user);
-            var claims = new List<Claim> {
-                new Claim(ClaimTypes.Name, userName),
-                new Claim(ClaimTypes.Email, user.Email)
-            };
+            var claims = await _userManager.GetClaimsAsync(user);            
 
             foreach (var role in roles)
             {
@@ -45,6 +43,7 @@ namespace Infrastructure.Identity
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
