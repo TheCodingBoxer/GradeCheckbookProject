@@ -1,12 +1,19 @@
 .full-page {
-  // background-image: url("../../images/fallone.jpg");
-  // background-repeat: no-repeat;
-  // background-size: cover;
-
+  background: radial-gradient(#000818 50%, #000207 100%);
   position: fixed;
+  width: 100%;
+  height: 100%;
 
-  height: 100vh;
-  width: 100vw;
+  & > .spinner-container {
+    height: 100px;
+    width: 100px;
+
+    text-align: center;
+    position: absolute;
+
+    top: 40%;
+    left: 45%;
+  }
 }
 
 #main-page {

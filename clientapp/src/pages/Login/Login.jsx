@@ -1,18 +1,23 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import "./Login.scss";
 import { useRootStore } from "../../infrastructure/hooks/useRootStoreContext";
 import dataService from "../../infrastructure/services/data-service";
 import ErrorMessage from "../../components/ErrorMessage/ErrorMessage";
 import InputText from "../../components/Input/InputText";
 import Button from "../../components/Button/Button";
+import Spinner from "../../components/Spinner/Spinner";
+import withOverlay from "../../components/withOverlay/withOverlay";
+
+const SpinnerOverlay = () => withOverlay(<Spinner size="large" />);
 
 export default function Login() {
+  const { currentUserStore, tokenStore } = useRootStore();
   const [userNameOrEmail, setUserNameOrEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErroMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const { currentUserStore, tokenStore } = useRootStore();
   const navigate = useNavigate();
 
   const onUserNameOrEmailValueChanged = ({ target }) => {
@@ -23,27 +28,28 @@ export default function Login() {
     setPassword(target.value);
   };
 
-  const onLoginClicked = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
     setErroMessage("");
     if (userNameOrEmail.length === 0 || password.length === 0) {
       setErroMessage("User name and/or password are missing");
       return;
     }
     try {
+      setLoading(true);
       const { data } = await dataService.login({
         userNameOrEmail,
         password,
       });
 
-      currentUserStore.setCurrentUser(
-        data.userProfile.displayName,
-        data.userProfile.userName
-      );
-
+      currentUserStore.setCurrentUser(data.userProfile);
       tokenStore.setAccessToken(data.token);
 
       navigate("/dashboard");
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log(error);
       if (error.response) {
         const { data } = error.response;
@@ -52,33 +58,28 @@ export default function Login() {
     }
   };
 
+  if (currentUserStore.userName) return <Navigate to="/" replace />;
+
   return (
-    <>
-      <video playsInline autoPlay muted loop id="myVideo">
-        <source
-          src="https://static.vecteezy.com/system/resources/previews/003/547/733/mp4/winter-snow-man-christmas-new-year-and-winter-holidays-themed-background-animations-free-video.mp4"
-          type="video/mp4"
+    <div id="login" className="container">
+      <h3>Sandbox</h3>
+      <hr />
+      <form onSubmit={handleSubmit}>
+        <InputText
+          placeholder="Username or email address"
+          value={userNameOrEmail}
+          onChange={onUserNameOrEmailValueChanged}
         />
-      </video>
-      <div className="full-page">
-        <div id="login" className="container">
-          <h3>Sandbox</h3>
-          <hr />
-          <InputText
-            placeholder="Username or email address"
-            value={userNameOrEmail}
-            onChange={onUserNameOrEmailValueChanged}
-          />
-          <InputText
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={onPasswordValueChanged}
-          />
-          <Button text="Sign In" onClick={onLoginClicked} />
-          {errorMessage && <ErrorMessage message={errorMessage} />}
-        </div>
-      </div>
-    </>
+        <InputText
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={onPasswordValueChanged}
+        />
+        <Button btnType="submit">Sign in</Button>
+        {errorMessage && <ErrorMessage message={errorMessage} />}
+      </form>
+      {loading && <SpinnerOverlay />}
+    </div>
   );
 }

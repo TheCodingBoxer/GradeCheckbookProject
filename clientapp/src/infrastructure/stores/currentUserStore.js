@@ -1,12 +1,17 @@
 class CurrentUserStore {
   constructor() {
-    this.displayName = "";
-    this.userName = "";
+    this.displayName = null;
+    this.userName = null;
   }
 
-  setCurrentUser(displayName, userName) {
-    this.displayName = displayName;
-    this.userName = userName;
+  setCurrentUser(data) {
+    if (data) {
+      this.displayName = data.displayName;
+      this.userName = data.userName;
+    } else {
+      this.displayName = null;
+      this.userName = null;
+    }
   }
 }
 
