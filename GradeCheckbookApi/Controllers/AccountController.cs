@@ -1,4 +1,5 @@
 ﻿using GradeCheckbookApi.Models;
+using IdentityModel;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -105,5 +106,60 @@ namespace GradeCheckbookApi.Controllers
 
             return Unauthorized();
         }
+
+        /// <summary>
+        /// Post a new user request
+        /// </summary>
+        /// <returns>Returns a AuthenticatedUserDto</returns>
+        /// <response code="200">Returns the current users profile and token</response>        
+        /// <response code="400">Returns if the user failed posting the correct information</response>
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]        
+        [HttpPost("Register")]
+        public async Task<ActionResult<AuthenticatedUserDto>> Register(RegisterDto registerDto)
+        {
+            if (await _userManager.Users.AnyAsync(x => x.Email == registerDto.Email))
+            {
+                return BadRequest("Email Taken");
+            }
+
+            if (await _userManager.Users.AnyAsync(x => x.UserName == registerDto.UserName))
+            {
+                return BadRequest("Username Taken");
+            }
+
+            var user = new ApplicationUser()
+            {
+                FirstName = registerDto.FirstName,
+                LastName = registerDto.LastName,
+                Email = registerDto.Email,
+                UserName = registerDto.UserName,
+            };
+
+            var result = await _userManager.CreateAsync(user, registerDto.Password);
+            if (result.Succeeded)
+            {
+                await _userManager.AddClaimsAsync(user, new Claim[]{
+                        new Claim(JwtClaimTypes.Name, $"{registerDto.FirstName} {registerDto.LastName}"),
+                        new Claim(JwtClaimTypes.GivenName, registerDto.FirstName),
+                        new Claim(JwtClaimTypes.FamilyName, registerDto.LastName),
+                        new Claim(JwtClaimTypes.Email, registerDto.Email) });
+
+                return new AuthenticatedUserDto()
+                {
+                    UserProfile = new UserDto()
+                    {
+                        DisplayName = user.FirstName,
+                        UserName = user.UserName,
+                        Email = user.Email
+                    },
+                    Token = await _tokenService.GetTokenAsync(user.UserName)
+                };
+            }
+
+            return BadRequest("Problem registering user");
+        }
+
     }
 }
